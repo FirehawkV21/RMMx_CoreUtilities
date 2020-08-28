@@ -92,10 +92,10 @@
  * the specified type for the specified array.
  * These only return an integer.
  * Examples:
- * MagicQuery.getAverage($gameParty.allMembers(), level);
- * MagicQuery.getMin($gameParty.allMembers(), level);
- * MagicQuery.getSum($gameParty.allMembers(), atk);
- * MagicQuery.getMax($gameParty.allMembers(), mhp);
+ * MagicQuery.getAverage($gameParty.allMembers(), 'level');
+ * MagicQuery.getMin($gameParty.allMembers(), 'level');
+ * MagicQuery.getSum($gameParty.allMembers(), 'atk');
+ * MagicQuery.getMax($gameParty.allMembers(), 'mhp');
  * 
  */
 
