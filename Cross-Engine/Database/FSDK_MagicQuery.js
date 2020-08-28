@@ -22,7 +22,7 @@
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * Installation and setup:
  * 1. First, download the library LoDash (this plugin requires it to work
- * properly) from the site https://lodash.com/ . You'll need the core library
+ * properly) from the site https://lodash.com/ . You'll need the full build
  * for this. Once you've downloaded it, rename the file to lodash.js.
  * 2. Copy the lodash.js to the js/libs folder. Depending on the engine,
  * edit either file and add the line above pixi.js.
@@ -43,8 +43,13 @@
  * This function will search an array for any items that meet the conditions.
  * The conditions is an eval and they should be in the format of "s.key"
  * (where key is the attribute you want to check).
- * Example:
- * MagicQuery.getAll($gameParty.allMembers(), "s.hp > 200");
+ * You can use the following key strings as the target as well:
+ * "Actors", "Classes", "Items", "Skills", "Weapons", "Armors",
+ * "Enemies", "PartyMembers"
+ * 
+ * Examples:
+ * MagicQuery.getAll("PartyMembers", "s.hp > 200");
+ * MagicQuery.getAll($gameParty.allMembers(), "s.level > 3");
  * 
  * MagicQuery.getUsableSkills(actorId, type);
  * MagicQuery.countUsableSkills(actorId, type);
@@ -92,10 +97,10 @@
  * the specified type for the specified array.
  * These only return an integer.
  * Examples:
- * MagicQuery.getAverage($gameParty.allMembers(), 'level');
- * MagicQuery.getMin($gameParty.allMembers(), 'level');
- * MagicQuery.getSum($gameParty.allMembers(), 'atk');
- * MagicQuery.getMax($gameParty.allMembers(), 'mhp');
+ * MagicQuery.getAverage($gameParty.allMembers(), level);
+ * MagicQuery.getMin($gameParty.allMembers(), level);
+ * MagicQuery.getSum($gameParty.allMembers(), atk);
+ * MagicQuery.getMax($gameParty.allMembers(), mhp);
  * 
  */
 
@@ -116,26 +121,29 @@ MagicQuery.getAll = function (target, condition) {
     //This switch case pretty much catches everything that need cleanup. If you pass a variable like $gameActors, then it 
     //will simply pass it on.
     switch (target) {
-        case "actors":
-            preppedData = MagicQuery.cleanupDb($dataActors);
+        case "Actors":
+            preppedData = $gameActors._data;
             break;
-        case "classes":
+        case "Classes":
             preppedData = MagicQuery.cleanupDb($dataClasses);
             break;
-        case "skills":
+        case "Skills":
             preppedData = MagicQuery.cleanupDb($dataSkills);
             break;
-        case "items":
+        case "Items":
             preppedData = MagicQuery.cleanupDb($dataItems);
             break;
-        case "weapons":
+        case "Weapons":
             preppedData = MagicQuery.cleanupDb($dataWeapons);
             break;
-        case "armor":
+        case "Armor":
             preppedData = MagicQuery.cleanupDb($dataArmors);
             break;
-        case "enemies":
+        case "Enemies":
             preppedData = MagicQuery.cleanupDb($dataEnemies);
+            break;
+          case "PartyMembers":
+            preppedData = $gameParty.allMembers();
             break;
         default:
             preppedData = target;
@@ -177,7 +185,7 @@ MagicQuery.getMax = function(data, type){
 }
 
 MagicQuery.getMin = function(data, type){
-    return _minBy(data, type);
+    return _.minBy(data, type);
 }
 
 MagicQuery.getAverage = function(data, type){
