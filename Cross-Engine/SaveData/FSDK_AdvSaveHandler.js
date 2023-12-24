@@ -1,7 +1,7 @@
 //==============================================
 // New Save Location
 // Version R1.00
-// Developed by Dragonhouse Software (AceOfaces)
+// Developed by Dragonhouse Software (AceOfAces)
 // Licensed under the Apache 2.0 License
 //==============================================
 
