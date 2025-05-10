@@ -1,6 +1,6 @@
 //==============================================
 // New Save Location
-// Version R1.00
+// Version R1.01
 // Developed by Dragonhouse Software (AceOfAces)
 // Licensed under the Apache 2.0 License
 //==============================================
@@ -8,7 +8,7 @@
 /*:
  * @target MV MZ
  * @author AceOfAces
- * @plugindesc R1.00 || Changes the save location. Recommended for users of RPG maker Cook Tool Deluxe
+ * @plugindesc R1.01 || Changes the save location. Recommended for users of RPG Maker Cook Tool Deluxe
  *
  * @param preferredLocation
  * @text Preferred Location
@@ -37,9 +37,21 @@
  * @default userdata/
  * @desc The name of the save folder. Must end with '/'.
  *
+ * @param useBrotliInDesktop
+ * @text Use Brotli Compression (MV only)
+ * @type boolean
+ * @default false
+ * @desc Use Brotli compression for save files, which provides better compression. Toggling this will break saves, so stick with either one.
+ *
+ * @param preferXdgDataHome
+ * @text Prefer XDG_DATA_HOME (Linux only)
+ * @type boolean
+ * @default false
+ * @desc Use the XDG_DATA_HOME environment variable for Linux builds. You may need to turn it on for certain cases (like packing the game in Flatpack).
+ *
  * @help
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- * Advanced Save Handler - Version R1.00
+ * Advanced Save Handler - Version R1.01
  * Developed by AceOfAces
  * Licensed under the Apache 2.0 license. Can be used for both non-commercial
  * and commercial games.
@@ -91,6 +103,14 @@
  * In RPG Maker MV, save files are placed into a folder named "Saves". This is
  * to better organize the files within the save location. This behaviour isn't
  * present on RPG Maker MZ.
+ * Advanced users can override the selected save location by pushing the
+ * following argument for the executable: "--save="path/to/save/folder"".
+ * Included from R1.01 onwards is the support for quick loading. This is
+ * done by pushing the following argument for the executable: "--qload=saveId"
+ * without quotes. This will load the save file with the given ID and
+ * start the game. This is a useful quality of life feature for players who
+ * want to quickly load a save file without going through the menu. Cook Tool
+ * Deluxe R5.11+ supports this feature.
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 */
 
@@ -103,99 +123,171 @@
     FirehawkADK.ParamDeck.WinSaveLocation = String(paramdeck['windowsPath']);
     FirehawkADK.ParamDeck.UnixLocation = String(paramdeck['unixPath']);
     FirehawkADK.ParamDeck.SaveFolderName = String(paramdeck['saveFolderName']);
+    FirehawkADK.ParamDeck.UseBrotliCompression = String(paramdeck['useBrotliInDesktop']).trim().toLowerCase() === 'true';
+    FirehawkADK.ParamDeck.UseXDGHomePath = String(paramdeck['preferXdgDataHome']).trim().toLowerCase() === 'true';
 
-    var path = require('path');
-    var systeminternals = require('os');
-    var home = systeminternals.homedir();
-    var base = path.dirname(process.mainModule.filename);
+    if (Utils.isNwjs()) {
+        var path = require('path');
+        var systeminternals = require('os');
+        var home = systeminternals.homedir();
+        var base = path.dirname(process.mainModule.filename);
+        var exec = path.dirname(process.execPath);
 
-    StorageManager.ReadSaveArgument = function () {
+        StorageManager.ReadSaveArgument = function () {
 
-        // Access command line arguments
-        const args = nw.App.argv;
+            // Access command line arguments
+            const args = nw.App.argv;
 
-        // Find the "--save" argument
-        const saveArg = args.find(arg => arg.startsWith('--save='));
+            // Find the "--save" argument
+            const saveArg = args.find(arg => arg.startsWith('--save='));
 
-        if (saveArg) {
-            // Extract the folder location
-            const folderPath = saveArg.split('=')[1];
+            if (saveArg) {
+                // Extract the folder location
+                const folderPath = saveArg.split('=')[1];
 
-            // Use the folderPath as needed in your application
-            return folderPath;
-        } else {
-            return null;
-        }
-
-    }
-
-    StorageManager.DetermineUserProfileLocation = function(){
-        var fs = require('fs');
-        var profilePath = "";
-        if (process.platform == "win32")
-            profilePath = path.join(home, FirehawkADK.ParamDeck.WinSaveLocation, FirehawkADK.ParamDeck.SaveFolderName);
-        else profilePath = path.join(home, FirehawkADK.ParamDeck.UnixLocation, FirehawkADK.ParamDeck.SaveFolderName);
-        if (!fs.existsSync(profilePath)) fs.mkdirSync(profilePath, { recursive: true });
-        return profilePath;
-    }
-
-    StorageManager.DetermineSavePath = function() {
-        var selectedPath = this.ReadSaveArgument();
-        if (selectedPath != null && selectedPath != "") return selectedPath;
-        else switch (FirehawkADK.ParamDeck.PreferredLocationId) {
-            case 2:
-                if (process.platform == "win32") return this.DetermineUserProfileLocation();
-                else return
-            case 1:
-                const nw = require('nw.gui');
-                return path.join(nw.App.dataPath, FirehawkADK.ParamDeck.SaveFolderName);
-            case 0:
-            default:
-                if (Utils.isOptionValid('test')) {
-                    return path.join(base, FirehawkADK.ParamDeck.SaveFolderName);
-                } else {
-                    return path.join(path.dirname(base), FirehawkADK.ParamDeck.SaveFolderName);
-                }
-        }
-    }
-
-
-    // RMMV Specific patch.
-    if (StorageManager.localFileDirectoryPath) {
-        StorageManager.localFileDirectoryPath = function () {
-            return StorageManager.DetermineSavePath();
-        };
-
-        StorageManager.saveToLocalFile = function(savefileId, json) {
-            var data = LZString.compressToBase64(json);
-            var fs = require('fs');
-            var dirPath = path.join(this.localFileDirectoryPath(), "Saves/");
-            var filePath = this.localFilePath(savefileId);
-            if (!fs.existsSync(dirPath)) {
-                fs.mkdirSync(dirPath);
-            }
-            fs.writeFileSync(filePath, data);
-        };
-
-        StorageManager.localFilePath = function(savefileId) {
-            var name;
-            var mover = "";
-            if (savefileId < 0) {
-                name = (typeof Yanfly !== "undefined" && typeof Yanfly.Param !== "undefined" && typeof Yanfly.Param.SaveTechLocalConfig != "undefined") ? Yanfly.Param.SaveTechLocalConfig : 'config.rpgsave';
-            } else if (savefileId === 0) {
-                name = (typeof Yanfly !== "undefined" && typeof Yanfly.Param !== "undefined" && typeof Yanfly.Param.SaveTechLocalGlobal !== "undefined") ? Yanfly.Param.SaveTechLocalGlobal : 'global.rpgsave';
+                // Use the folderPath as needed in your application
+                return folderPath;
             } else {
-                name = (typeof Yanfly !== "undefined" && typeof Yanfly.Param !== "undefined" && typeof Yanfly.Param.SaveTechLocalSave !== "undefined") ? Yanfly.Param.SaveTechLocalSave.format(savefileId) : 'file%1.rpgsave'.format(savefileId);
-                mover = "Saves"
+                return null;
             }
-            return path.join(this.localFileDirectoryPath(), mover, name);
-        };
-    }
 
-    //RMMZ specific patch
-    if (StorageManager.fileDirectoryPath) {
-        StorageManager.fileDirectoryPath = function () {
-            return StorageManager.DetermineSavePath();
+        }
+
+        StorageManager.DetermineUserProfileLocation = function () {
+            var fs = require('fs');
+            var profilePath = "";
+            if (process.platform == "win32")
+                profilePath = path.join(home, FirehawkADK.ParamDeck.WinSaveLocation, FirehawkADK.ParamDeck.SaveFolderName);
+            else if (process.platform == "linux") profilePath = (FirehawkADK.ParamDeck.UseXDGHomePath) ? path.join(process.env.XDG_DATA_HOME || path.join(systeminternals.homedir(), FirehawkADK.ParamDeck.UnixLocation, FirehawkADK.ParamDeck.SaveFolderName)) : path.join(home, FirehawkADK.ParamDeck.UnixLocation, FirehawkADK.ParamDeck.SaveFolderName);
+            else profilePath = path.join(home, FirehawkADK.ParamDeck.UnixLocation, FirehawkADK.ParamDeck.SaveFolderName);
+            if (!fs.existsSync(profilePath)) fs.mkdirSync(profilePath, { recursive: true });
+            return profilePath;
+        }
+
+        StorageManager.DetermineSavePath = function () {
+            var selectedPath = this.ReadSaveArgument();
+            if (selectedPath != null && selectedPath != "") return selectedPath;
+            else switch (FirehawkADK.ParamDeck.PreferredLocationId) {
+                case 2:
+                    return this.DetermineUserProfileLocation();
+                case 1:
+                    const nw = require('nw.gui');
+                    return path.join(nw.App.dataPath, FirehawkADK.ParamDeck.SaveFolderName);
+                case 0:
+                default:
+                    if (Utils.isOptionValid('test')) {
+                        return path.join(base, FirehawkADK.ParamDeck.SaveFolderName);
+                    } else {
+                        return path.join(path.dirname(exec), FirehawkADK.ParamDeck.SaveFolderName);
+                    }
+            }
+        }
+
+
+        // RMMV Specific patch.
+        if (StorageManager.localFileDirectoryPath) {
+            StorageManager.localFileDirectoryPath = function () {
+                return StorageManager.DetermineSavePath();
+            };
+
+            StorageManager.saveToLocalFile = function (savefileId, json) {
+                var data;
+                if (FirehawkADK.ParamDeck.UseBrotliCompression) {
+                    var zlib = require('zlib');
+                    data = zlib.brotliCompressSync(json);
+                }
+                else data = LZString.compressToBase64(json);
+                var fs = require('fs');
+                var dirPath = path.join(this.localFileDirectoryPath(), "Saves/");
+                var filePath = this.localFilePath(savefileId);
+                if (!fs.existsSync(dirPath)) {
+                    fs.mkdirSync(dirPath);
+                }
+                fs.writeFileSync(filePath, data);
+            };
+
+            StorageManager.localFilePath = function (savefileId) {
+                var name;
+                var mover = "";
+                if (savefileId < 0) {
+                    name = (typeof Yanfly !== "undefined" && typeof Yanfly.Param !== "undefined" && typeof Yanfly.Param.SaveTechLocalConfig != "undefined") ? Yanfly.Param.SaveTechLocalConfig : 'config.rpgsave';
+                } else if (savefileId === 0) {
+                    name = (typeof Yanfly !== "undefined" && typeof Yanfly.Param !== "undefined" && typeof Yanfly.Param.SaveTechLocalGlobal !== "undefined") ? Yanfly.Param.SaveTechLocalGlobal : 'global.rpgsave';
+                } else {
+                    name = (typeof Yanfly !== "undefined" && typeof Yanfly.Param !== "undefined" && typeof Yanfly.Param.SaveTechLocalSave !== "undefined") ? Yanfly.Param.SaveTechLocalSave.format(savefileId) : 'file%1.rpgsave'.format(savefileId);
+                    mover = "Saves"
+                }
+                return path.join(this.localFileDirectoryPath(), mover, name);
+            };
+            Scene_boot_start = Scene_Boot.prototype.start;
+            Scene_Boot.prototype.start = function () {
+                if (Utils.isNwjs() && DataManager.isAnySavefileExists()) {
+                    // Access command line arguments
+                    const args = nw.App.argv;
+                    // Find the "--save" argument
+                    const saveArg = args.find(arg => arg.startsWith('--qload='));
+                    if (saveArg) {
+                        // Extract the folder location
+                        const saveId = saveArg.split('=')[1];
+                        var id = parseInt(saveId);
+                        var isLoaded = DataManager.loadGame(id);
+                        if (isLoaded) {
+                            Scene_Base.prototype.start.call(this);
+                            SoundManager.preloadImportantSounds();
+                            if ($gameSystem.versionId() !== $dataSystem.versionId) {
+                                $gamePlayer.reserveTransfer($gameMap.mapId(), $gamePlayer.x, $gamePlayer.y);
+                                $gamePlayer.requestMapReload();
+                            }
+                            SceneManager.goto(Scene_Map);
+                            $gameSystem.onAfterLoad();
+                        }
+                        else Scene_boot_start.call(this);
+                    }
+                    else Scene_boot_start.call(this);
+                }
+            }
+        }
+
+        //RMMZ specific patch
+        if (StorageManager.fileDirectoryPath) {
+            StorageManager.fileDirectoryPath = function () {
+                return StorageManager.DetermineSavePath();
+            }
+            Scene_Boot_start = Scene_Boot.prototype.start;
+            Scene_Boot.prototype.start = function () {
+                if (Utils.isNwjs() && DataManager.isAnySavefileExists()) {
+                    // Access command line arguments
+                    const args = nw.App.argv;
+                    // Find the "--save" argument
+                    const saveArg = args.find(arg => arg.startsWith('--qload='));
+                    if (saveArg) {
+                        // Extract the folder location
+                        const saveId = saveArg.split('=')[1];
+                        var id = parseInt(saveId);
+                        DataManager.loadGame(id)
+                            .then(() => {
+                                Scene_Base.prototype.start.call(this);
+                                SoundManager.preloadImportantSounds();
+                                if ($gameSystem.versionId() !== $dataSystem.versionId) {
+                                    const mapId = $gameMap.mapId();
+                                    const x = $gamePlayer.x;
+                                    const y = $gamePlayer.y;
+                                    const d = $gamePlayer.direction();
+                                    $gamePlayer.reserveTransfer(mapId, x, y, d, 0);
+                                    $gamePlayer.requestMapReload();
+                                }
+                                this.resizeScreen();
+                                this.updateDocumentTitle();
+                                SceneManager.goto(Scene_Map);
+                            })
+                            .catch((ex) => {
+                                console.log(ex);
+                                Scene_Boot_start.call(this);
+                            });
+                    }
+                    else Scene_Boot_start.call(this);
+                };
+            }
         }
     }
 })();
