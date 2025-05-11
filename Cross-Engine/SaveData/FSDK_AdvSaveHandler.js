@@ -232,6 +232,10 @@
                         var id = parseInt(saveId);
                         var isLoaded = DataManager.loadGame(id);
                         if (isLoaded) {
+                            if (typeof nw === "object") {
+                                const window = nw.Window.get();
+                                window.on("close", () => window.close(true));
+                            }
                             Scene_Base.prototype.start.call(this);
                             SoundManager.preloadImportantSounds();
                             if ($gameSystem.versionId() !== $dataSystem.versionId) {
