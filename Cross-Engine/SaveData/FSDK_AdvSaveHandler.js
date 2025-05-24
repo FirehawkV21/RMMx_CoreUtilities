@@ -220,7 +220,7 @@
                 return path.join(this.localFileDirectoryPath(), mover, name);
             };
             Scene_boot_start = Scene_Boot.prototype.start;
-            Scene_Boot.prototype.start = function () {
+            Scene_Boot.prototype.start = function() {
                 if (Utils.isNwjs() && DataManager.isAnySavefileExists()) {
                     // Access command line arguments
                     const args = nw.App.argv;
@@ -238,6 +238,7 @@
                             }
                             Scene_Base.prototype.start.call(this);
                             SoundManager.preloadImportantSounds();
+                            this.updateDocumentTitle();
                             if ($gameSystem.versionId() !== $dataSystem.versionId) {
                                 $gamePlayer.reserveTransfer($gameMap.mapId(), $gamePlayer.x, $gamePlayer.y);
                                 $gamePlayer.requestMapReload();
