@@ -1,6 +1,6 @@
 //==============================================
 // New Save Location
-// Version R1.01
+// Version R1.01A
 // Developed by Dragonhouse Software (AceOfAces)
 // Licensed under the Apache 2.0 License
 //==============================================
@@ -8,7 +8,7 @@
 /*:
  * @target MV MZ
  * @author AceOfAces
- * @plugindesc R1.01 || Changes the save location. Recommended for users of RPG Maker Cook Tool Deluxe
+ * @plugindesc R1.01A || Changes the save location. Recommended for users of RPG Maker Cook Tool Deluxe
  *
  * @param preferredLocation
  * @text Preferred Location
@@ -250,6 +250,7 @@
                     }
                     else Scene_boot_start.call(this);
                 }
+                else Scene_boot_start.call(this);
             }
         }
 
@@ -291,7 +292,8 @@
                             });
                     }
                     else Scene_Boot_start.call(this);
-                };
+                }
+                else Scene_Boot_start.call(this);
             }
         }
     }
