@@ -57,6 +57,8 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * option in the settings menu. Check the Microsoft Learn docs for how
  * to check if it's a handheld, if you plan to write your own bootstrap:
  * https://learn.microsoft.com/en-us/gaming/gdk/docs/gdk-dev/pc-dev/handheld/handheld-guidance
+ * For RPG Maker Cook Tool Deluxe users, ensure you are using R6.01u4
+ * or later, as it includes the necessary bootstrap changes.
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * */
 
