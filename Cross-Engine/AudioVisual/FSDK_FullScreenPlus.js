@@ -31,9 +31,6 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * support for Windows PC Handhelds by automatically enabling fullscreen
  * mode when the game is launched with the '--handheld' command line argument
  * (and hide the option, as it's unnecessary for this type of device).
- * For users of RPG Maker Cook Tool Deluxe, make sure that you use R6.01u4
- * or later, as the included bootstrap includes the check for the
- * Device Type (and if it is a handheld, it will give that argument).
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * Installation:
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
