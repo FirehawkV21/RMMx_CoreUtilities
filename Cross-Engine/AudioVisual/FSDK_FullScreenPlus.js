@@ -18,13 +18,14 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * @default false
  *
  * @help
- * ============================================================================
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=
  * Full Screen +
  * Developer: AceOfAces
  * Version: R1.00
  * Licensed under the Apache License, Version 2.0. OK for non-commercial and
  * commercial use.
- * ===========================================================================
+ * Please credit me as AceOfAces when you use this plugin.
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * This plugin adds a fullscreen toggle to your game, allowing players to
  * switch between fullscreen and windowed mode. In addition, it provides
  * support for Windows PC Handhelds by automatically enabling fullscreen
@@ -33,15 +34,30 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * For users of RPG Maker Cook Tool Deluxe, make sure that you use R6.01u4
  * or later, as the included bootstrap includes the check for the
  * Device Type (and if it is a handheld, it will give that argument).
- * ===========================================================================
- * Instructions:
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * Installation:
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * 1. Install the plugin by placing it in the 'js/plugins' folder of your
  * RPG Maker project.
  * 2. Open the Plugin Manager and add 'FSDK_FullScreenPlus' to your list of
  * plugins.
  * 3. Configure the 'Default Fullscreen' parameter to set whether the game
  * starts in fullscreen mode or not.
- * ===========================================================================
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * Configuration:
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * - Default Fullscreen: Set this parameter to 'true' if you want the game to
+ *   start in fullscreen mode by default. Set it to 'false' if you prefer
+ *  windowed mode.
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * Handheld support:
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * Launch the game with the '--handheld' command line argument to
+ * automatically enable fullscreen mode and hide the fullscreen toggle
+ * option in the settings menu. Check the Microsoft Learn docs for how
+ * to check if it's a handheld, if you plan to write your own bootstrap:
+ * https://learn.microsoft.com/en-us/gaming/gdk/docs/gdk-dev/pc-dev/handheld/handheld-guidance
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * */
 
 var paramdeck = PluginManager.parameters('FSDK_FullScreenPlus');
