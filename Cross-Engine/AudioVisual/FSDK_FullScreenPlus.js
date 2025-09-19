@@ -59,6 +59,19 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * https://learn.microsoft.com/en-us/gaming/gdk/docs/gdk-dev/pc-dev/handheld/handheld-guidance
  * For RPG Maker Cook Tool Deluxe users, ensure you are using R6.01u4
  * or later, as it includes the necessary bootstrap changes.
+ * Important: As of the time of writing, handheld support is only available
+ * for Windows PC Handhelds that run on Windows 11 or later (currently,
+ * only the Asus ROG Xbox Ally will have official support for this, with
+ * other handhelds receiving it in the future).
+ * For the Steam Deck, you will need to use a plugin that interfaces with
+ * Steamworks API to check for handheld or Big Picture Mode, as this plugin
+ * does not have that capability (yet).
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * Compatibility:
+ * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ * RPG Maker MV: Compatible with RPG Maker MV version 1.6.3 and later.
+ * RPG Maker MZ: Compatible with RPG Maker MZ version 1.9.0 and later.
+ * It may work with older versions, but it is not guaranteed.
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
  * */
 
