@@ -17,11 +17,17 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * @desc Sets whether the game starts in fullscreen mode or not. (true/false)
  * @default false
  *
+ * @param steamBigPictureModeCheck
+ * @text Steam Big Picture Mode Check
+ * @type note
+ * @desc The code used to check if Steam is in Big Picture Mode.
+ * @default "if (typeof NekoGakuen_SteamworksPlus.SteamUtils_IsSteamInBigPictureMode != 'undefined') { \n isHandheld = NekoGakuen_SteamworksPlus.SteamUtils_IsSteamInBigPictureMode(); \n }"
+ *
  * @help
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=
  * Full Screen +
  * Developer: AceOfAces
- * Version: R1.00
+ * Version: R1.00A
  * Licensed under the Apache License, Version 2.0. OK for non-commercial and
  * commercial use.
  * Please credit me as AceOfAces when you use this plugin.
@@ -74,6 +80,7 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
 
 var paramdeck = PluginManager.parameters('FSDK_FullScreenPlus');
 FirehawkADK.ParamDeck.DefaultFullScreen = paramdeck['defaultFullscreen'] === 'true';
+FirehawkADK.ParamDeck.SteamBigPictureModeCheck = paramdeck['steamBigPictureModeCheck'];
 let isHandheld = false;
 
 FirehawkADK.FullscreenPlus.isHandheld = function () {
@@ -82,6 +89,8 @@ FirehawkADK.FullscreenPlus.isHandheld = function () {
 
 FirehawkADK.FullscreenPlus.CheckHandheldFlag = function () {
     if (Utils.isNwjs()) {
+        eval(FirehawkADK.ParamDeck.SteamBigPictureModeCheck);
+        if (isHandheld) return;
         for (arg in nw.App.argv) {
             if (nw.App.argv[arg] === '--handheld') {
                 Graphics._requestFullScreen();
