@@ -7,7 +7,7 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
 /*:
  * @target MV MZ
  * @author AceOfAces
- * @plugindesc R1.00 || Adds a fullscreen toggle, alongside adding support for Windows PC Handhelds.
+ * @plugindesc R1.01 || Adds a fullscreen toggle, alongside adding support for Windows PC Handhelds.
  *
  * @param defaultFullscreen
  * @text Default Fullscreen
@@ -100,11 +100,13 @@ FirehawkADK.FullscreenPlus.CheckHandheldFlag = function () {
     }
 }
 
+ConfigManager.FullScreenMode = FirehawkADK.ParamDeck.DefaultFullScreen;
+
 FirehawkADK.ExtraOptions.FullscreenPlus.ApplyConfig = ConfigManager.applyData;
 ConfigManager.applyData = function (config) {
     FirehawkADK.ExtraOptions.FullscreenPlus.ApplyConfig.call(this, config);
     this.FullScreenMode = (config['FullScreenMode'] != undefined) ? config['FullScreenMode'] : isHandheld || ConfigManager.FullScreenMode;
-        if (ConfigManager.FullScreenMode && !Graphics._isFullScreen()) {
+        if (ConfigManager.FullScreenMode && !!Graphics._isFullScreen()) {
         Graphics._requestFullScreen();
     }
 
@@ -136,13 +138,11 @@ Window_Options.prototype.handleFullScreenConfig = function (symbol, value) {
     if (value) {
         Graphics._requestFullScreen();
     } else {
-        if (Graphics._isFullScreen()) Graphics._cancelFullScreen();
+        if (!!Graphics._isFullScreen()) Graphics._cancelFullScreen();
     }
     this.setConfigValue(symbol, value);
     this.redrawItem(this.findSymbol('FullScreenMode'));
 }
-
-ConfigManager.FullScreenMode = FirehawkADK.ParamDeck.DefaultFullScreen;
 
 if (Utils.RPGMAKER_NAME === 'MV') {
     const _Scene_Boot_start = Scene_Boot.prototype.start;
