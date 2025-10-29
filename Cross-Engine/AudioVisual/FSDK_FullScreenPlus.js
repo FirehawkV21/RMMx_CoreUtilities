@@ -27,7 +27,7 @@ FirehawkADK.FullscreenPlus = FirehawkADK.FullscreenPlus || {};
  * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=
  * Full Screen +
  * Developer: AceOfAces
- * Version: R1.00A
+ * Version: R1.01
  * Licensed under the Apache License, Version 2.0. OK for non-commercial and
  * commercial use.
  * Please credit me as AceOfAces when you use this plugin.
